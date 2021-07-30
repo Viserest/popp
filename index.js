@@ -10,29 +10,44 @@ app.use(cookieParser());
 app.use(bodyParser().json());
 app.use(bodyParser().urlencode({extend: true}));
 
-function verify_auth(auth) {
-  
+function collection(name) {
+  return fs.readFile(name + '.json', function(err, data) {
+    return JSON.parse(data);
+  });
+}
+
+app.use(function(req, res, next) {
   var json = fs.readFile('users.json', function(err, data) {
     return JSON.parse(data);
   });
   for (u of json) {
-    if (u.auth == auth) {
-      return (u, true);
+    if (u.auth == req.cookies.auth) {
+      next();
     }
   }
-  return (null, false);
-}
+  next();
+});
 
 // Home page
 app.get('/', function(req, res) {
   
-  res.sendFile(__dirname + '/public/home.html');
+  var user = verify_auth(auth);
+  res.render('template/home', {
+    title: 'Popp',
+    file: '../pages/home',
+    img: user.image
+  });
 });
 
 // Signin page
 app.get('/signin', function(req, res) {
   
-  res.sendFile(__dirname + '/public/signin.html');
+  var user = verify_auth(auth);
+  res.render('template/home', {
+    title: 'Popp: Signin',
+    file: '../pages/home',
+    img: user.image
+  });
 });
 
 // Signup page
