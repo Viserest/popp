@@ -10,20 +10,14 @@ app.use(cookieParser());
 app.use(bodyParser().json());
 app.use(bodyParser().urlencode({extend: true}));
 
-function collection(name) {
-  return fs.readFile(name + '.json', function(err, data) {
-    return JSON.parse(data);
-  });
-}
-
 app.use(function(req, res, next) {
-  var json = fs.readFile('users.json', function(err, data) {
-    return JSON.parse(data);
-  });
-  for (u of json) {
-    if (u.auth == req.cookies.auth) {
-      next();
+  req.user = fs.readFile('users.json', function(err, data) {
+    for (u of JSON.parse(data)) {
+      if (u.auth == req.cookies.auth) {
+        return u;
+      }
     }
+    return null;
   }
   next();
 });
@@ -31,40 +25,53 @@ app.use(function(req, res, next) {
 // Home page
 app.get('/', function(req, res) {
   
-  var user = verify_auth(auth);
+  var name, image;
+  if (req.user != null) {
+    name = req.user.image;
+    image = req.user.name;
+  }
+  
   res.render('template/home', {
     title: 'Popp',
     file: '../pages/home',
-    img: user.image
-  });
-});
+    name: name,
+    image: image
+  })
+})
 
 // Signin page
 app.get('/signin', function(req, res) {
   
-  var user = verify_auth(auth);
-  res.render('template/home', {
-    title: 'Popp: Signin',
-    file: '../pages/home',
-    img: user.image
-  });
-});
+  res.render('template/blank', {
+    title: 'Popp Signin',
+    file: '../pages/signin'
+  })
+})
 
 // Signup page
 app.get('/signup', function(req, res) {
   
-  res.sendFile(__dirname + '/public/signup.html');
-});
+  res.render('template/blank', {
+    title: 'Popp Signup',
+    file: '../pages/signup'
+  })
+})
 
 // Profile page
 app.get('/profile', function(req, res) {
   
-  var user, status = verify_auth(req.cookies.auth);
-  if (user == false) {
-    res.render('home', {});
-  } else {
-    res.render('home', {});
+  if (req.user == null) {
+    res.redirect('/signin?status=invalid_auth');
   }
+  
+  res.render('template/home', {
+    title: 'Popp Profile',
+    file: '../pages/profile',
+    name: req.user.name,
+    email: req.user.email,
+    image: req.user.image
+  })
+})
 
 // API requests page
 app.post('/api/requests', function(req, res) {
@@ -74,8 +81,22 @@ app.post('/api/requests', function(req, res) {
 });
 
 // API accounts page
-app.post('/api/accounts', function(req, res) {
+app.all('/api/accounts', function(req, res) {
   
   var request = req.query.r;
-  var auth = req.cookies.auth;
+  if (request == 'signup') {
+    
+    if (req.method != 'post') {
+      res.redirect('/signup?status=invalid_method');
+    }
+  } else if (request == 'signin') {
+    
+    if (req.method != 'post') {
+      res.redirect('/signin?status=invalid_method');
+    }
+  } else if (request == 'signout') {
+    
+    res.clearCookie(auth);
+    var auth = req.cookies.auth;
+  }
 });
