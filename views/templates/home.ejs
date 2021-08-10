@@ -1,0 +1,85 @@
+<html>
+  <head>
+    <title><%- title %></title>
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <style id='styles'>
+      body {
+        margin: 0;
+        font-family: '';
+      }
+      /* Links */
+      nav {
+        position: absolute,
+        top: 0;
+        bottom: 0;
+        width: 240px;
+        background: #11101d;
+      }
+      nav a {
+        color: white;
+        text-decoration: none;
+        padding: 5px 0 5px 10px;
+        margin: 5px 0 5px 10px;
+      }
+      nav a:hover {
+        color: rgb(220,220,220);
+        padding-left: 10px;
+      }
+      /* Footer */
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href='/'>
+        <i class='bx bxs-home'></i>
+        <span>Home</span>
+      </a>
+      <a href='/console'>
+        <i class='bx bxs-dashboard' ></i>
+        <span>Console</span>
+      </a>
+      <a href='/console/drones'>
+        <i class='bx bxs-joystick-button' ></i>
+        <span>Drone Bus</span>
+      </a>
+      <a href='/console/map'>
+        <i class='bx bxs-map' ></i>
+        <span>Map</span>
+      </a>
+      <div>
+      <% if (locals.user) { %>
+      <a href='/user/home'>
+        <i class='bx bxs-user-account' ></i>
+        <span><%= locals.user.info.name %>
+      </a>
+      <a href='/user/signup'>
+        <i class='bx bxs-user-plus' ></i>
+        <span>Create Account</span>
+      </a>
+      <a href='/user/signin'>
+        <i class='bx bxs-user-check'></i>
+        <span>Switch Account</span>
+      </a>
+      <a href='/api/user?r=signout'>
+        <i class='bx bxs-log-out' ></i>
+        <span>Signout</span>
+      </a>
+      <% } else { %>
+      <a href='/user/signup'>
+        <i class='bx bxs-user-plus' ></i>
+        <span>Create Account</span>
+      </a>
+      <a href='/user/signin'>
+        <i class='bx bxs-user-check'></i>
+        <span>Switch Account</span>
+      </a>
+      <% } %>
+      </div>
+    </nav>
+    <% include('../pages/' + file) %>
+    <footer>
+      <p>Copyright &copy; 2021 by Popp</p>
+      <p>Made by: Seth Cooper</p>
+    </footer>
+  </body>
+</html>
