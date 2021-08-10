@@ -3,100 +3,91 @@ const app = express();
 const fs = require('fs');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 
 app.set('view engine', 'ejs');
 app.use(cookieParser());
-app.use(bodyParser().json());
-app.use(bodyParser().urlencode({extend: true}));
+app.use(express.json());
+app.use(express.urlencode({extend: true}));
 
-app.use(function(req, res, next) {
-  req.user = fs.readFile('users.json', function(err, data) {
-    for (u of JSON.parse(data)) {
-      if (u.auth == req.cookies.auth) {
-        return u;
-      }
-    }
-    return null;
+app.use((req, res, next) => {
+  // DeviceID
+  if (!req.cookies.device) {
+    res.cookie('device', crypto.createHash('sha256').update(crypto.randomBytes(256) + Date.now()).digest('hex'));
   }
+  // AuthID
+  res.locals.user = JSON.parse(fs.readFileSync('users.json')).find(v => v.auth.token == req.cookies.auth && v.auth.expires > Date.now());
+  
   next();
 });
 
 // Home page
-app.get('/', function(req, res) {
-  
-  var name, image;
-  if (req.user != null) {
-    name = req.user.image;
-    image = req.user.name;
-  }
-  
-  res.render('template/home', {
+app.get('/', (req, res) => {
+  res.render('templates/home', {
     title: 'Popp',
-    file: '../pages/home',
-    name: name,
-    image: image
+    file: 'home'
   })
 })
 
-// Signin page
-app.get('/signin', function(req, res) {
-  
-  res.render('template/blank', {
-    title: 'Popp Signin',
-    file: '../pages/signin'
+// Console page
+app.get('/console', (req, res) => {
+  res.render('templates/home', {
+    title: 'Popp Console',
+    file: 'console'
   })
 })
 
-// Signup page
-app.get('/signup', function(req, res) {
+// User home page
+app.get('/user/home', (req, res) => {
   
-  res.render('template/blank', {
-    title: 'Popp Signup',
-    file: '../pages/signup'
-  })
-})
-
-// Profile page
-app.get('/profile', function(req, res) {
-  
-  if (req.user == null) {
-    res.redirect('/signin?status=invalid_auth');
+  if (!res.locals.user) {
+    res.redirect('/user/signin');
   }
-  
-  res.render('template/home', {
-    title: 'Popp Profile',
-    file: '../pages/profile',
-    name: req.user.name,
-    email: req.user.email,
-    image: req.user.image
+  res.render('templates/home', {
+    title: 'Popp Profile Home',
+    file: 'profile'
+  })
+})
+
+// User signup page
+app.get('/user/signup', (req, res) => {
+  res.render('templates/home', {
+    title: 'Popp Signup',
+    file: 'signup'
+  })
+})
+
+// User signin page
+app.get('/user/signin', (req, res) => {
+  res.render('templates/home', {
+    title: 'Popp Signin',
+    file: 'signin'
   })
 })
 
 // API requests page
-app.post('/api/requests', function(req, res) {
+app.all('/api/requests', (req, res) => {
   
   var request = req.query.r;
-  var auth = req.cookies.auth;
-});
+})
 
-// API accounts page
-app.all('/api/accounts', function(req, res) {
+// API console page
+app.all('/api/console', (req, res) => {
+  
+  var request = req.query.r;
+})
+
+// API user page
+app.all('/api/user', (req, res) => {
   
   var request = req.query.r;
   if (request == 'signup') {
     
-    if (req.method != 'post') {
-      res.redirect('/signup?status=invalid_method');
-    }
+    
   } else if (request == 'signin') {
     
-    if (req.method != 'post') {
-      res.redirect('/signin?status=invalid_method');
-    }
+    
   } else if (request == 'signout') {
     
-    res.clearCookie(auth);
-    var auth = req.cookies.auth;
+    
   }
-});
+})
