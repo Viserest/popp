@@ -7,4 +7,6 @@ while True:
     if c == '\'': state = not state
     elif state and c == ' ': cmd.append('')
     else: cmd[-1] += c
-  # 
+  # Command comprehension
+  # ['course','add','English','2nd']
+  # []
