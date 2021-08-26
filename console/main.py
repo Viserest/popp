@@ -1,3 +1,5 @@
+def command(arg, cmd): return if arg == cmd
+
 # command processing
 while True:
   req = input('> ')
@@ -8,5 +10,8 @@ while True:
     elif state and c == ' ': cmd.append('')
     else: cmd[-1] += c
   # Command comprehension
-  # ['course','add','English','2nd']
-  # []
+  
+  command = ['school','drone','code']
+  command.getIndex(cmd[0])
+  
+  command = {'school':{'':{},'':{},'':{}},'drone':{},'code':{}}
