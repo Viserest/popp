@@ -8,17 +8,80 @@
       }
       body.dark {
         background: #141414;
+        color: #ffffff;
+      }
+      
+      /* Navigation */
+      nav {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: #001659;
+        width: 240px;
+        height: 100%;
+      }
+      nav div.title h1 {
+        font-size: 24px;
+        margin: 10px;
+      }
+      nav div.title i {
+        font-size: 28px;
+      }
+      nav div.links a {
+        display: block;
+        color: #4d6fd6;
+        text-decoration: none;
+        font-size: 20px;
+      }
+      nav div.links i {
+        font-size: 28px;
+        position: relative;
+        top: 3px;
+      }
+      nav div.bottom {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+      }
+      /* Slim Navigation */
+      nav.slim {
+        width: 40px;
+      }
+      
+      /* Article */
+      article {
+        position: absolute;
+        top: 0;
+        left: 240px;
+        font-size: 15px;
+        text-align: center;
+      }
+      
+      /* Footer */
+      footer {
+        position: absolute;
+        bottom: 0;
+        left: 240px;
+        text-align: center;
+        font-size: 15px;
+      }
+      footer p {
+        margin: 0;
       }
     </style>
   </head>
   <body>
     <nav>
-      <div>
-        <a href='/'><i class='bx bxs-dashboard'></i><span>Dashboard</span></a>
-        <a href='/terminal'><i class='bx bxs-terminal'></i><span>Terminal</span></a>
-        <a href='/sports'><i class='bx bxs-baseball'></i><span>Scoreboard</span></a>
+      <div class='title'>
+        <h1>Console</h1>
+        <i id='navMode' class='bx bxs-left-arrow'></i>
       </div>
-      <div>
+      <div class='links'>
+        <a onclick='Widget.add("dashboard")'><i class='bx bxs-dashboard'></i><span>Dashboard</span></a>
+        <a onclick='Widget.add("terminal")'><i class='bx bxs-terminal'></i><span>Terminal</span></a>
+        <a onclick='Widget.add("sports")'><i class='bx bxs-baseball'></i><span>Scoreboard</span></a>
+      </div>
+      <div class='links bottom'>
         <a><i class='bx bxs-user'></i><span>User Profile</span></a>
         <a id='visualMode'></a>
       </div>
@@ -27,5 +90,29 @@
     <footer>
       <p>Made by Seth Cooper</p>
     </footer>
+    <script>
+      class Widget {
+        elements = [];
+        add(e) {
+          if (elements.contains(e)) return;
+          return;
+        }
+        remove(e) {
+          if (!elements.contains(e)) return;
+          return;
+        }
+      }
+      screenMode(localStorage.getItem('visualMode'));
+      document.getElementById('visualMode').onclick = () => screenMode(localStorage.getItem('visualMode') == 'light' ? 'dark':'light');
+      function screenMode(m) {
+        var content;
+        if (m == 'light') content = `<i class='bx bxs-moon'></i><span>Dark Mode</span>`;
+        else content = `<i class='bx bxs-sun'</i><span>Light Mode</span>`;
+        document.getElementById('visualMode').innerHtml = content;
+        localStorage.setItem('visualMode', m);
+        document.body.classList.add(m);
+        document.body.classList.remove(m == 'light' ? 'dark':'light');
+      }
+    </script>
   </body>
 </html>
